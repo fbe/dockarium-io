@@ -50,7 +50,8 @@ class DockerEventListenerActor(host: String, port: Int) extends Actor {
     case MessageChunk(data, _) =>
       println(new String(data.toByteArray))
       val jsValue = Json.parse(data.toByteArray)
-      Json.fromJson[DockerEvent](jsValue).map(println)
+      Json.fromJson[DockerEvent](jsValue).map(event => actorsystem.actorSelection("/user/dockarium") ! event)
+
 
     case unknown =>
       println("Unknown data received. Data: " + unknown + " - Class: " + unknown.getClass.getCanonicalName)
