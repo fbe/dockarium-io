@@ -1,6 +1,6 @@
 package actors
 
-import akka.actor.Actor
+import akka.actor.{ActorRef, Actor}
 import akka.io.IO
 import akka.io.Tcp.Connected
 import play.libs.Akka
@@ -16,14 +16,14 @@ case class DockerEvent(status: String, id: String, from: String, time: Long)
 import play.api.libs.json._
 
 
-class DockerEventListenerActor(host: String, port: Int) extends Actor {
+class DockerEventListenerActor(host: String, port: Int, dockariumActor: ActorRef) extends Actor {
 
 
   implicit val personFormat = Json.format[DockerEvent]
 
-  implicit val actorsystem = Akka.system()
-
   println("Starting DockerEventListenerActor")
+
+  implicit val actorSystem = context.system
 
   IO(Http) ! Http.Connect(host, port)
 
@@ -50,7 +50,7 @@ class DockerEventListenerActor(host: String, port: Int) extends Actor {
     case MessageChunk(data, _) =>
       println(new String(data.toByteArray))
       val jsValue = Json.parse(data.toByteArray)
-      Json.fromJson[DockerEvent](jsValue).map(event => actorsystem.actorSelection("/user/dockarium") ! event)
+      Json.fromJson[DockerEvent](jsValue).foreach(event => dockariumActor ! event)
 
 
     case unknown =>

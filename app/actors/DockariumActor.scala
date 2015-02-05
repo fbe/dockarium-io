@@ -1,16 +1,15 @@
 package actors
 
 import actors.messages.StopMessage
-import akka.actor.{ActorRef, Props, Actor}
-import akka.spray.UnregisteredActorRef
-import play.libs.Akka
+import actors.websocket.WebSocketActor.{DeregisterWebSocket, RegisterWebSocket}
+import akka.actor.{Actor, ActorRef, Props}
 
 /**
  * Created by becker on 2/4/15.
  */
 class DockariumActor extends Actor {
 
-  val connections = List(Akka.system.actorOf(Props(classOf[DockerEventListenerActor], "localhost", 2375)))
+  val connections = List(context.actorOf(Props(classOf[DockerEventListenerActor], "localhost", 2375, self)))
 
   private var connectedWebsockets: Set[ActorRef] = Set()
 
