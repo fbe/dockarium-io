@@ -87,6 +87,16 @@ app.filter('eventStatusIconClass', function(){
     }
 });
 
+app.controller("AdminCtrl", function($scope, $log, serverConnection){
+
+    $scope.dockerhost = {};
+
+    $scope.saveDockerConnection = function(){
+        serverConnection.send({command: "saveDockerConnection", payload: $scope.dockerhost});
+    }
+
+});
+
 app.controller("WebsocketStatusCtrl", function($scope, $log, serverConnection){
 
     $scope.status = serverConnection.status;
