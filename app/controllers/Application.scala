@@ -13,7 +13,7 @@ object Application extends Controller {
 
   import play.api.Play.current
 
-  def websocket = WebSocket.acceptWithActor[String, JsValue] { request => out =>
+  def websocket = WebSocket.acceptWithActor[JsValue, JsValue] { request => out =>
     WebSocketActor.props(out, Akka.system().actorSelection("/user/dockarium"))
   }
 

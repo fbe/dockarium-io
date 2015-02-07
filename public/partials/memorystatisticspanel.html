@@ -1,0 +1,15 @@
+<h3>Kernel Memory Statistics</h3>
+<table class="table table-striped table-bordered">
+    <thead>
+    <tr>
+        <th>Key</th>
+        <th>Value</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="(k,v) in meminfo">
+        <td>{{k}}</td>
+        <td>{{(v / 1024).toFixed(2)}} MB</td>
+    </tr>
+    </tbody>
+</table>
