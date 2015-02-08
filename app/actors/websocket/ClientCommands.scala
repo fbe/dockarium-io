@@ -1,5 +1,6 @@
 package actors.websocket
 
+import akka.actor.ActorRef
 import play.api.libs.json.JsValue
 
 
@@ -13,6 +14,7 @@ object ClientCommands {
   case object GetMemInfo
   case object GetServerVersion
 
+  case class GetAllDockerConnections(clientActor: ActorRef)
   case class ClientCommand(command: String, payload: Option[JsValue])
   case class SaveDockerConnection(name: String, host: String, port: Int)
 

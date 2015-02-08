@@ -1,7 +1,7 @@
 package actors.websocket
 
 import actors.DockerEvent
-import actors.websocket.ClientCommands.{SaveDockerConnection, ClientCommand}
+import actors.websocket.ClientCommands.{GetAllDockerConnections, SaveDockerConnection, ClientCommand}
 import actors.websocket.WebSocketActor.{DeregisterWebSocket, RegisterWebSocket}
 import akka.actor.{Actor, ActorRef, ActorSelection, Props}
 import docker.DockerCommands.CreateContainersCommand
@@ -42,6 +42,8 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
 
 
   def processClientCommand(clientCommand: ClientCommand) = clientCommand.command match {
+
+    case "getAllDockerConnections" => dockariumActor ! GetAllDockerConnections(out)
 
     case "saveDockerConnection" =>
       Logger.info("Received saveDockerConnection")

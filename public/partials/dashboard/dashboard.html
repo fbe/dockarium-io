@@ -1,0 +1,45 @@
+
+<h2>Dashboard</h2>
+
+<div class="row" ng-controller="DashboardCtrl">
+
+    <div class="col-md-8">
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Memory Usage Charts</h3>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 col-lg-offset-2" ng-include="'assets/partials/memorydoughnutchartpanel.html'"></div>
+            <div class="col-md-6 col-md-offset-1" ng-include="'assets/partials/memorybarchartpanel.html'">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6" ui-view="eventlog"></div>
+            <div class="col-md-6" ng-include="'assets/partials/memorystatisticspanel.html'"></div>
+        </div>
+    </div>
+
+
+    <!-- right container, daemon infos -->
+    <div class="col-md-4">
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Docker Daemon Infos</h3>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12" ng-include="'assets/partials/serverversionpanel.html'"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12" ng-include="'assets/partials/serverinfopanel.html'"></div>
+        </div>
+    </div>
+
+</div>

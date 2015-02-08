@@ -20,7 +20,7 @@ case class DockerImageDeletedEvent(imageId: String, timestamp: Long)
 import play.api.libs.json._
 
 
-class DockerEventListenerActor(host: String, port: Int, dockariumActor: ActorRef) extends Actor {
+class DockerConnectionActor(host: String, port: Int, dockariumActor: ActorRef) extends Actor {
 
 
   implicit val personFormat = Json.format[DockerEvent]

@@ -1,4 +1,51 @@
-var app = angular.module("dockarium", ['ui.bootstrap', 'chart.js']);
+var app = angular.module("dockarium", ['ui.bootstrap', 'chart.js', 'ui.router']);
+
+
+app.config(function($stateProvider, $urlRouterProvider){
+    $urlRouterProvider.otherwise("/");
+
+    $stateProvider
+
+        .state('welcome', {
+            url: '/',
+            views: {
+
+                '': {
+                    templateUrl: 'assets/partials/welcome.html'
+                },
+
+                'dockerConnectionsTable@welcome': {
+                    templateUrl: 'assets/partials/dockerconnectionstable.html',
+                    controller: 'DockerConnectionsTableCtrl'
+                }
+
+
+            }
+        })
+
+        .state('dashboard', {
+            url: '/dashboard',
+            views: {
+
+                '': {
+                    templateUrl: 'assets/partials/dashboard/dashboard.html'
+                },
+
+                'eventlog@dashboard': {
+                    templateUrl: 'assets/partials/dashboard/eventlogpanel.html',
+                    controller: 'EventLogCtrl'
+                }
+            }
+        })
+
+
+        .state('admin', {
+            url: '/admin',
+            templateUrl: 'assets/partials/admin/index.html'
+        })
+
+});
+
 
 app.factory('serverConnection', function($log, $rootScope){
 
@@ -87,27 +134,31 @@ app.filter('eventStatusIconClass', function(){
     }
 });
 
-app.controller("AdminCtrl", function($scope, $log, serverConnection){
 
-    $scope.dockerhost = {};
-
-    $scope.saveDockerConnection = function(){
-        serverConnection.send({command: "saveDockerConnection", payload: $scope.dockerhost});
-    }
-
+app.controller("AuthenticationCtrl", function($scope, $log, $modal, serverConnection){
+   $scope.loginUserName = "Felix"
 });
 
-app.controller("WebsocketStatusCtrl", function($scope, $log, serverConnection){
+app.controller("DockerConnectionsTableCtrl", function($scope, $log, serverConnection){
+    $log.info("DockerConnectionsTableCtrl loaded");
 
-    $scope.status = serverConnection.status;
+    serverConnection.send({command: "getAllDockerConnections"});
 
-    $scope.$on('WebSocketStatusChange', function(){
-        $scope.status = serverConnection.status;
+    $scope.connections = {};
+
+    $scope.$on('serverEvent', function(eventName, payload){
+        if(payload.name == "dockerConnections"){
+            $log.debug(payload.payLoad);
+            $scope.connections = payload.payLoad
+        }
     });
 
 });
 
+
 app.controller("EventLogCtrl", function($scope, $log){
+
+    $log.warn("EventLogCtrl loaded!");
 
     $scope.eventlog = [];
 
@@ -130,6 +181,28 @@ app.controller("EventLogCtrl", function($scope, $log){
     });
 
 });
+
+app.controller("AdminCtrl", function($scope, $log, serverConnection){
+
+    $scope.dockerhost = {};
+
+    $scope.saveDockerConnection = function(){
+        serverConnection.send({command: "saveDockerConnection", payload: $scope.dockerhost});
+    }
+
+});
+
+app.controller("WebsocketStatusCtrl", function($scope, $log, serverConnection){
+
+    $scope.status = serverConnection.status;
+
+    $scope.$on('WebSocketStatusChange', function(){
+        $scope.status = serverConnection.status;
+    });
+
+});
+
+
 
 app.controller("ServerInfoCtrl", function($scope, $log) {
 
@@ -161,7 +234,7 @@ app.controller("ServerVersionCtrl", function($scope, $log) {
 });
 
 
-app.controller("IndexCtrl", function($scope, $rootScope, $log, serverConnection) {
+app.controller("DashboardCtrl", function($scope, $rootScope, $log, serverConnection) {
 
 
     $scope.$on('serverEvent', function(eventName, msg){

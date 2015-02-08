@@ -1,0 +1,18 @@
+<table class="table table-bordered table-striped">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Address</th>
+        <th>Port</th>
+        <th>Status</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="connection in connections">
+        <td>{{connection.name}}</td>
+        <td>{{connection.address}}</td>
+        <td>{{connection.port}}</td>
+        <td>{{connection.status}}</td>
+    </tr>
+    </tbody>
+</table>

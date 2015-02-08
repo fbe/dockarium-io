@@ -21,5 +21,6 @@ libraryDependencies ++= Seq(
   "org.webjars" % "angularjs" % "1.3.11",
   "org.webjars" % "reconnecting-websocket" % "23d2fbc",
   "org.webjars" % "font-awesome" % "4.3.0-1",
-  "org.webjars" % "angular-ui-bootstrap" % "0.12.0"
+  "org.webjars" % "angular-ui-bootstrap" % "0.12.0",
+  "org.webjars" % "angular-ui-router" % "0.2.13"
 )
