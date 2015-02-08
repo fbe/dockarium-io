@@ -41,6 +41,11 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
   implicit val formats2 = Json.format[SaveDockerConnection]
 
 
+  var authenticated = false
+
+  out ! Json.toJson(ServerEvent("AuthenticationRequired", Json.parse("{}")))
+
+
   def processClientCommand(clientCommand: ClientCommand) = clientCommand.command match {
 
     case "getAllDockerConnections" => dockariumActor ! GetAllDockerConnections(out)

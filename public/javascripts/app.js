@@ -136,7 +136,48 @@ app.filter('eventStatusIconClass', function(){
 
 
 app.controller("AuthenticationCtrl", function($scope, $log, $modal, serverConnection){
+
+
+    $scope.$on('serverEvent', function(eventName, payload){
+
+        if(payload.name == "AuthenticationRequired"){
+            $log.info("authentication required - showing login modal");
+            $scope.open();
+        }
+    });
+
    $scope.loginUserName = "Felix"
+   $scope.items = ['item1', 'item2', 'item3'];
+
+    $scope.open = function () {
+
+        var modalInstance = $modal.open({
+            templateUrl: '/assets/partials/authentication/authenticationoverlay.html',
+            controller: 'AuthenticationWindowCtrl',
+            backdrop:false,
+            keyboard:false,
+            resolve: {
+                items: function () {
+                    return $scope.items;
+                }
+            }
+        });
+
+        modalInstance.result.then(function (selectedItem) {
+            $scope.selected = selectedItem;
+        }, function () {
+            $log.info('Modal dismissed at: ' + new Date());
+        });
+    };
+
+});
+
+
+app.controller('AuthenticationWindowCtrl', function ($scope, $modalInstance, items, $log) {
+
+    $scope.signIn = function(){
+        $log.info("Logging in with " + $scope.username + " and " + $scope.password);
+    }
 });
 
 app.controller("DockerConnectionsTableCtrl", function($scope, $log, serverConnection){
@@ -148,7 +189,6 @@ app.controller("DockerConnectionsTableCtrl", function($scope, $log, serverConnec
 
     $scope.$on('serverEvent', function(eventName, payload){
         if(payload.name == "dockerConnections"){
-            $log.debug(payload.payLoad);
             $scope.connections = payload.payLoad
         }
     });
