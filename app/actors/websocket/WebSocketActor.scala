@@ -56,8 +56,15 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
 
       // FIXME security MD5 hash!
       authenticationCommand match {
-        case Authenticate("admin", "admin") => out ! Json.toJson (ServerEvent ("AuthenticationSuccessful", Json.parse ("{}") ) )
-        case _ => Logger.warn("Authentication failed!")
+
+        case Authenticate("admin", "admin") =>
+          out ! Json.toJson (ServerEvent ("AuthenticationSuccessful", Json.parse ("{}") ) )
+          authenticated = true
+
+        case _ =>
+          Logger.warn("Authentication failed!")
+          out ! Json.toJson(ServerEvent("AuthenticationFailed", Json.parse("{}")))
+
       }
 
 

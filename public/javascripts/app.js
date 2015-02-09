@@ -79,7 +79,7 @@ app.factory('serverConnection', function($log, $rootScope){
     };
 
     severConnection.send = function(args){
-        $log.info("ServerConnection - sending " + JSON.stringify(args));
+        $log.debug("[Outgoing Message] " + JSON.stringify(args));
         ws.send(JSON.stringify(args));
     };
 
@@ -107,7 +107,9 @@ app.factory('serverConnection', function($log, $rootScope){
         // TODO basic event validation here (contains name..?)
         $rootScope.$apply(function () {
             var msg = JSON.parse(msgevent.data);
+            $log.debug("[Incoming Message] " + JSON.stringify(msg))
             $rootScope.$broadcast('serverEvent', msg);
+            $log.debug("broadcasted " + JSON.stringify(msg))
         });
 
     };
@@ -144,10 +146,12 @@ app.controller("AuthenticationCtrl", function($scope, $log, $modal, serverConnec
 
             if(typeof(Storage) !== "undefined" && localStorage.username && localStorage.password) {
                 $log.info("trying to authenticate using localstorage data");
+
                 serverConnection.send({command: "authenticate", payload: {
                     username: localStorage.username,
                     password: localStorage.password
                 }});
+
             } else {
                 $log.info("authentication required - showing login modal");
                 $scope.open();
@@ -239,8 +243,6 @@ app.controller("DockerConnectionsTableCtrl", function($scope, $log, serverConnec
 
 app.controller("EventLogCtrl", function($scope, $log){
 
-    $log.warn("EventLogCtrl loaded!");
-
     $scope.eventlog = [];
 
     $scope.$on('serverEvent', function(eventName, payload){
@@ -285,7 +287,9 @@ app.controller("WebsocketStatusCtrl", function($scope, $log, serverConnection){
 
 
 
-app.controller("ServerInfoCtrl", function($scope, $log) {
+app.controller("ServerInfoCtrl", function($scope, $log, serverConnection) {
+
+    serverConnection.send({command: "getServerInfo"});
 
     $scope.serverInfo = {};
 
@@ -301,11 +305,11 @@ app.controller("ServerInfoCtrl", function($scope, $log) {
 
 });
 
-app.controller("ServerVersionCtrl", function($scope, $log) {
+app.controller("ServerVersionCtrl", function($scope, $log, serverConnection) {
+
+    serverConnection.send({command: "getServerVersion"});
 
     $scope.$on('serverEvent', function(event, msg){
-
-        $log.debug("ServerVersionCtrl received an event");
 
         if (msg.name == "serverVersion"){
             $scope.serverVersion = msg.payLoad;
@@ -316,6 +320,8 @@ app.controller("ServerVersionCtrl", function($scope, $log) {
 
 
 app.controller("DashboardCtrl", function($scope, $rootScope, $log, serverConnection) {
+
+    serverConnection.send({command: "getMemInfo"});
 
     $scope.$on('serverEvent', function(eventName, msg){
 
@@ -373,8 +379,6 @@ app.controller("DashboardCtrl", function($scope, $rootScope, $log, serverConnect
         if(serverConnection.status.name == 'connected') {
             $log.info("Sending refreshs");
             // TODO each component must send its own refresh
-            serverConnection.send({command: "getServerInfo"});
-            serverConnection.send({command: "getServerVersion"});
             serverConnection.send({command: "getMemInfo"});
         }
     });
