@@ -146,7 +146,7 @@ app.controller("AuthenticationCtrl", function($scope, $log, $modal, serverConnec
         }
     });
 
-   $scope.loginUserName = "Felix"
+   $scope.loginUserName = "Felix";
    $scope.items = ['item1', 'item2', 'item3'];
 
     $scope.open = function () {
@@ -173,12 +173,32 @@ app.controller("AuthenticationCtrl", function($scope, $log, $modal, serverConnec
 });
 
 
-app.controller('AuthenticationWindowCtrl', function ($scope, $modalInstance, items, $log) {
+app.controller('AuthenticationWindowCtrl', function ($scope, $modalInstance, items, $log, serverConnection) {
 
     $scope.signIn = function(){
-        $log.info("Logging in with " + $scope.username + " and " + $scope.password);
-    }
+
+        serverConnection.send({command: "authenticate", payload: {
+            username: $scope.username,
+            password: $scope.password
+        }});
+
+    };
+
+    $scope.$on('serverEvent', function(eventName, payload){
+        if(payload.name == "AuthenticationSuccessful"){
+            $modalInstance.close()
+            $log.warn("atuoghasit");
+        }
+
+    });
+
+    /*
+     AuthenticationSuccessful
+     */
 });
+
+
+
 
 app.controller("DockerConnectionsTableCtrl", function($scope, $log, serverConnection){
     $log.info("DockerConnectionsTableCtrl loaded");

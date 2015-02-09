@@ -1,7 +1,7 @@
 package actors.websocket
 
 import actors.DockerEvent
-import actors.websocket.ClientCommands.{GetAllDockerConnections, SaveDockerConnection, ClientCommand}
+import actors.websocket.ClientCommands.{Authenticate, GetAllDockerConnections, SaveDockerConnection, ClientCommand}
 import actors.websocket.WebSocketActor.{DeregisterWebSocket, RegisterWebSocket}
 import akka.actor.{Actor, ActorRef, ActorSelection, Props}
 import docker.DockerCommands.CreateContainersCommand
@@ -39,7 +39,7 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
 
   implicit val formats = Json.format[ClientCommand]
   implicit val formats2 = Json.format[SaveDockerConnection]
-
+  implicit val formats3 = Json.format[Authenticate]
 
   var authenticated = false
 
@@ -49,6 +49,16 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
   def processClientCommand(clientCommand: ClientCommand) = clientCommand.command match {
 
     case "getAllDockerConnections" => dockariumActor ! GetAllDockerConnections(out)
+
+    case "authenticate" =>
+      val authenticationCommand = Json.fromJson[Authenticate](clientCommand.payload.get).get
+      Logger.info(s"authenticating ${authenticationCommand.username} with ${authenticationCommand.password}")
+
+      authenticationCommand match {
+        case Authenticate("admin", "admin") => out ! Json.toJson (ServerEvent ("AuthenticationSuccessful", Json.parse ("{}") ) )
+        case _ => Logger.warn("Authentication failed!")
+      }
+
 
     case "saveDockerConnection" =>
       Logger.info("Received saveDockerConnection")
