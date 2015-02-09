@@ -5,35 +5,51 @@ import actors.websocket.ClientCommands.{GetAllDockerConnections, SaveDockerConne
 import actors.websocket.ServerEvent
 import actors.websocket.WebSocketActor.{DeregisterWebSocket, RegisterWebSocket}
 import akka.actor.{Actor, ActorRef, Props}
+import akka.util.Timeout
 import play.Logger
 import play.api.db.DB
 import play.api.Play.current
 import play.api.libs.json.Json
 
+import scala.collection.immutable.Iterable
+import scala.concurrent.Future
+
 /**
  * Created by becker on 2/4/15.
  */
 
-case class DockerConnection(name: String, address: String, port: Int, status: String)
+case class DockerConnectionInfo(name: String, address: String, port: Int, status: String)
 
 
 class DockariumActor extends Actor {
 
-  implicit val dcf = Json.format[DockerConnection]
+  implicit val dcf = Json.format[DockerConnectionInfo]
   implicit val dcs = Json.format[ServerEvent]
 
-  var dockerEventListeners: Map[String, ActorRef] = Map()
-  //List(context.actorOf(Props(classOf[DockerEventListenerActor], "localhost", 2375, self)))
+  var dockerConnectionActors: Map[String, ActorRef] = Map()
 
   private var connectedWebsockets: Set[ActorRef] = Set()
 
   override def receive: Receive = {
 
     case GetAllDockerConnections(clientRef) =>
-      clientRef ! Json.toJson(ServerEvent("dockerConnections", Json.toJson(Seq(DockerConnection("foo", "bar", 123, "connected")))))
+
+      import akka.pattern.ask
+      import scala.concurrent.duration._
+      import scala.concurrent.ExecutionContext.Implicits.global
+
+      implicit val askTimeout = Timeout(5.second)
+
+      val futures: Iterable[Future[DockerConnectionInfo]] = dockerConnectionActors.map { case (_, dca) =>
+        Logger.debug(s"Sending ask to actor $dca")
+        (dca ? "GetStatus").mapTo[DockerConnectionInfo]
+      }
+
+      Future.sequence(futures).onSuccess { case connectionInfos =>
+          clientRef ! Json.toJson(ServerEvent("dockerConnections", Json.toJson(connectionInfos)))
+      }
 
     case StopMessage =>
-      println("shutting down all connections")
       connectedWebsockets.foreach(_ ! StopMessage)
 
 
@@ -41,15 +57,9 @@ class DockariumActor extends Actor {
     case DeregisterWebSocket(actorRef) => connectedWebsockets = connectedWebsockets - actorRef
 
     case SaveDockerConnection(name, host, port) =>
-      Logger.info(s"i would save the new connection ($name) to http://$host:$port now")
 
-      /*DB.withConnection { conn =>
-        val st = conn.createStatement
-        val rs = st.execute("SELECT 1 FROM DUAL")
-
-      }*/
-      if (!dockerEventListeners.contains(name)){
-        dockerEventListeners + (name -> context.actorOf(Props(classOf[DockerConnectionActor], host, port, self)))
+      if (!dockerConnectionActors.contains(name)){
+        dockerConnectionActors = dockerConnectionActors + (name -> context.actorOf(Props(classOf[DockerConnectionActor], name, host, port, self)))
       }
 
     case event: DockerEvent => connectedWebsockets.foreach(_ ! event)

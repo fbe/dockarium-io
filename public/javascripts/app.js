@@ -177,6 +177,7 @@ app.controller("AuthenticationCtrl", function($scope, $log, $modal, serverConnec
             }
         });
 
+
         modalInstance.result.then(function (selectedItem) {
             $scope.selected = selectedItem;
         }, function () {
@@ -216,12 +217,7 @@ app.controller('AuthenticationWindowCtrl', function ($scope, $modalInstance, ite
     });
 
 
-
-
-
-
 });
-
 
 
 
@@ -322,6 +318,10 @@ app.controller("ServerVersionCtrl", function($scope, $log, serverConnection) {
 app.controller("DashboardCtrl", function($scope, $rootScope, $log, serverConnection) {
 
     serverConnection.send({command: "getMemInfo"});
+
+    $scope.refresh = function(){
+        serverConnection.send({command: "getMemInfo"});
+    };
 
     $scope.$on('serverEvent', function(eventName, msg){
 

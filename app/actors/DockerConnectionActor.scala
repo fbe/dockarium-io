@@ -1,6 +1,7 @@
 package actors
 
-import akka.actor.{ActorRef, Actor}
+import akka.actor.{ActorLogging, ActorRef, Actor}
+import akka.event.LoggingReceive
 import akka.io.IO
 import akka.io.Tcp.Connected
 import play.api.Logger
@@ -20,18 +21,19 @@ case class DockerImageDeletedEvent(imageId: String, timestamp: Long)
 import play.api.libs.json._
 
 
-class DockerConnectionActor(host: String, port: Int, dockariumActor: ActorRef) extends Actor {
-
+class DockerConnectionActor(name: String, host: String, port: Int, dockariumActor: ActorRef) extends Actor {
 
   implicit val personFormat = Json.format[DockerEvent]
 
-  println("Starting DockerEventListenerActor")
+  Logger.info(s"Starting DockerConnectionActor for $host:$port")
 
   implicit val actorSystem = context.system
 
   IO(Http) ! Http.Connect(host, port)
 
   override def receive: Receive = {
+
+    case "GetStatus" => sender ! DockerConnectionInfo(name, host, port, "connecting")
 
     case Connected(_,_) =>
       println(s"connected to $host:$port")
@@ -43,6 +45,9 @@ class DockerConnectionActor(host: String, port: Int, dockariumActor: ActorRef) e
   }
 
   def connected: Receive = {
+
+    case "GetStatus" => sender ! DockerConnectionInfo(name, host, port, "connected")
+
     case _: ChunkedResponseStart =>
       println("Chunked response started")
       context.become(receivingChunks)
@@ -51,6 +56,10 @@ class DockerConnectionActor(host: String, port: Int, dockariumActor: ActorRef) e
   }
 
   def receivingChunks: Receive = {
+
+    case "GetStatus" =>
+      sender ! DockerConnectionInfo(name, host, port, "listening for events")
+
     case MessageChunk(data, _) =>
       println(new String(data.toByteArray))
       val jsValue = Json.parse(data.toByteArray)
