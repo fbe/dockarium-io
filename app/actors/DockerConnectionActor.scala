@@ -37,7 +37,7 @@ class DockerConnectionActor(name: String, host: String, port: Int, dockariumActo
 
     case Connected(_,_) =>
       println(s"connected to $host:$port")
-      sender() ! HttpRequest(HttpMethods.GET, Uri("/v1.16/events"))
+      sender() ! HttpRequest(HttpMethods.GET, Uri("/v1.15/events"))
       context.become(connected)
 
 

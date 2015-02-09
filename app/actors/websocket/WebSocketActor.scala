@@ -28,7 +28,7 @@ object WebSocketActor {
 
 class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Actor {
 
-  def dockerApiUrl = "http://localhost:2375/v1.16/"
+  def dockerApiUrl = "http://localhost:2375/v1.15/"
   dockariumActor ! RegisterWebSocket(self)
 
   implicit val personFormat = Json.format[DockerEvent]
@@ -77,7 +77,7 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
 
       Logger.info("Received getServerInfo - Firing with WS")
 
-      WS.url("http://localhost:2375/v1.16/info").get().map { r =>
+      WS.url("http://localhost:2375/v1.15/info").get().map { r =>
         Logger.debug(s"Sending response ${r.body}")
         val value = Json.parse(r.body)
         Logger.debug(s"Parsed debug $value")
@@ -88,7 +88,7 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
 
       Logger.info("Received getServerVersion - Firing with WS")
 
-      WS.url("http://localhost:2375/v1.16/version").get().map { r =>
+      WS.url("http://localhost:2375/v1.15/version").get().map { r =>
         Logger.debug(s"Sending response ${r.body}")
         val value = Json.parse(r.body)
         Logger.debug(s"Parsed debug $value")
