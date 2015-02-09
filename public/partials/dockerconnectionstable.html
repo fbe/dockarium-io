@@ -5,6 +5,7 @@
         <th>Address</th>
         <th>Port</th>
         <th>Status</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -13,6 +14,7 @@
         <td>{{connection.address}}</td>
         <td>{{connection.port}}</td>
         <td>{{connection.status}}</td>
+        <td><a ui-sref="dashboard({dockerConnectionName: connection.name})"><i class="fa fa-tachometer"></i> Dashboard</a></td>
     </tr>
     </tbody>
 </table>

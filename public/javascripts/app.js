@@ -1,6 +1,5 @@
 var app = angular.module("dockarium", ['ui.bootstrap', 'chart.js', 'ui.router']);
 
-
 app.config(function($stateProvider, $urlRouterProvider){
     $urlRouterProvider.otherwise("/");
 
@@ -24,10 +23,11 @@ app.config(function($stateProvider, $urlRouterProvider){
         })
 
         .state('dashboard', {
-            url: '/dashboard',
+            url: '/dashboard/:dockerConnectionName',
             views: {
 
                 '': {
+                    controller: 'DashboardCtrl',
                     templateUrl: 'assets/partials/dashboard/dashboard.html'
                 },
 
@@ -107,9 +107,7 @@ app.factory('serverConnection', function($log, $rootScope){
         // TODO basic event validation here (contains name..?)
         $rootScope.$apply(function () {
             var msg = JSON.parse(msgevent.data);
-            $log.debug("[Incoming Message] " + JSON.stringify(msg))
             $rootScope.$broadcast('serverEvent', msg);
-            $log.debug("broadcasted " + JSON.stringify(msg))
         });
 
     };
@@ -315,7 +313,9 @@ app.controller("ServerVersionCtrl", function($scope, $log, serverConnection) {
 });
 
 
-app.controller("DashboardCtrl", function($scope, $rootScope, $log, serverConnection) {
+app.controller("DashboardCtrl", function($scope, $rootScope, $log, serverConnection, $stateParams) {
+
+    $scope.connectionName = $stateParams.dockerConnectionName;
 
     serverConnection.send({command: "getMemInfo"});
 
