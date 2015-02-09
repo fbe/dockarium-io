@@ -1,28 +1,31 @@
-<div class="modal-header">
-    <h3 class="modal-title">Login required</h3>
-</div>
-<div class="modal-body">
+<form novalidate class="form-horizontal">
 
-    <form novalidate class="form-horizontal">
+    <div class="modal-header">
+        <h3 class="modal-title">Login required</h3>
+    </div>
+
+
+    <div class="modal-body">
+
         <div class="form-group">
             <label for="username" class="col-sm-2 control-label">Username</label>
+
             <div class="col-sm-10">
                 <input type="text" class="form-control" id="username" placeholder="Username" ng-model="username">
             </div>
         </div>
         <div class="form-group">
             <label for="password" class="col-sm-2 control-label">Password</label>
+
             <div class="col-sm-10">
                 <input type="password" class="form-control" id="password" placeholder="Password" ng-model="password">
             </div>
         </div>
-    </form>
 
+    </div>
 
-</div>
-<div class="modal-footer">
-    <!-- <button class="btn btn-primary" ng-click="ok()">OK</button> -->
-   <!-- <button class="btn btn-warning" ng-click="cancel()">Cancel</button> -->
-    <button type="submit" class="btn btn-primary" ng-click="signIn()">Sign in</button>
-</div>
-</div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" ng-click="signIn()">Sign in</button>
+    </div>
+
+</form>

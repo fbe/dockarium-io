@@ -48,14 +48,6 @@
 
                         <li ng-controller="AuthenticationCtrl">
                             <p class="navbar-text"><i class="fa fa-user"></i> Logged in as: {{loginUserName}}</p>
-
-
-                            <button class="btn btn-default" ng-click="open()">Open me!</button>
-                            <button class="btn btn-default" ng-click="open('lg')">Large modal</button>
-                            <button class="btn btn-default" ng-click="open('sm')">Small modal</button>
-                            <div ng-show="selected">Selection from a modal: {{ selected }}</div>
-
-
                         </li>
                         <li>
                             <p class="navbar-text" ng-include="'assets/partials/websocketstatuspanel.html'">

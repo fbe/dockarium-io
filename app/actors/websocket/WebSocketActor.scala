@@ -54,6 +54,7 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
       val authenticationCommand = Json.fromJson[Authenticate](clientCommand.payload.get).get
       Logger.info(s"authenticating ${authenticationCommand.username} with ${authenticationCommand.password}")
 
+      // FIXME security MD5 hash!
       authenticationCommand match {
         case Authenticate("admin", "admin") => out ! Json.toJson (ServerEvent ("AuthenticationSuccessful", Json.parse ("{}") ) )
         case _ => Logger.warn("Authentication failed!")

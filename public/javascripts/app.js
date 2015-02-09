@@ -141,8 +141,18 @@ app.controller("AuthenticationCtrl", function($scope, $log, $modal, serverConnec
     $scope.$on('serverEvent', function(eventName, payload){
 
         if(payload.name == "AuthenticationRequired"){
-            $log.info("authentication required - showing login modal");
-            $scope.open();
+
+            if(typeof(Storage) !== "undefined" && localStorage.username && localStorage.password) {
+                $log.info("trying to authenticate using localstorage data");
+                serverConnection.send({command: "authenticate", payload: {
+                    username: localStorage.username,
+                    password: localStorage.password
+                }});
+            } else {
+                $log.info("authentication required - showing login modal");
+                $scope.open();
+            }
+
         }
     });
 
@@ -186,15 +196,26 @@ app.controller('AuthenticationWindowCtrl', function ($scope, $modalInstance, ite
 
     $scope.$on('serverEvent', function(eventName, payload){
         if(payload.name == "AuthenticationSuccessful"){
-            $modalInstance.close()
-            $log.warn("atuoghasit");
+            $modalInstance.close();
+
+            // FIXME security - MD5 hash!
+
+            if(typeof(Storage) !== "undefined") {
+                localStorage.setItem("username", $scope.username);
+                localStorage.setItem("password", $scope.password);
+            } else {
+                $log.warn("Not saving credentials to the webstorage because of ")
+            }
+
         }
 
     });
 
-    /*
-     AuthenticationSuccessful
-     */
+
+
+
+
+
 });
 
 
@@ -295,7 +316,6 @@ app.controller("ServerVersionCtrl", function($scope, $log) {
 
 
 app.controller("DashboardCtrl", function($scope, $rootScope, $log, serverConnection) {
-
 
     $scope.$on('serverEvent', function(eventName, msg){
 
