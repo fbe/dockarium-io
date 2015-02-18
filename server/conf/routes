@@ -13,7 +13,7 @@ GET         /assets/*file    controllers.Assets.versioned(path="/public", file: 
 
 GET        /webjars/*file        controllers.WebJarAssets.at(file)
 
-
+GET        /angulartest.html    controllers.Application.angular
 # WebSocket
 GET        /websocket            controllers.Application.websocket
 

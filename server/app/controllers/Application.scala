@@ -11,6 +11,10 @@ object Application extends Controller {
     Ok(views.html.main())
   }
 
+  def angular = Action {
+    Ok(views.html.angular())
+  }
+
   import play.api.Play.current
 
   def websocket = WebSocket.acceptWithActor[JsValue, JsValue] { request => out =>
