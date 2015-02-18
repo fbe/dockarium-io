@@ -15,6 +15,8 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += "io.spray" % "spray-can_2.11" % "1.3.2"
 
+pipelineStages := Seq(digest)
+
 libraryDependencies ++= Seq(
   "org.webjars" %% "webjars-play" % "2.3.0-2",
   "org.webjars" % "bootstrap" % "3.3.2",

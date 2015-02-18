@@ -3,9 +3,9 @@
 <html ng-app="dockarium">
     <head>
         <title>Dockarium.io</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/angular-chart.css")">
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/angular-chart.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
         <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.css"))'>
         <link rel="stylesheet" media="screen" href="@routes.WebJarAssets.at(WebJarAssets.locate("font-awesome.min.css"))">
 
@@ -14,11 +14,11 @@
         <script src="@routes.WebJarAssets.at(WebJarAssets.locate("ui-bootstrap-tpls.min.js"))"></script>
         <script src="@routes.WebJarAssets.at(WebJarAssets.locate("reconnecting-websocket.js"))"></script>
 
-        <script src="@routes.Assets.at("chartjs/Chart.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("chartjs/Chart.js")" type="text/javascript"></script>
 
-        <script src="@routes.Assets.at("javascripts/angular-chart.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/angular-chart.js")" type="text/javascript"></script>
 
-        <script src="@routes.Assets.at("javascripts/app.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.versioned("javascripts/app.js")" type="text/javascript"></script>
 
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
