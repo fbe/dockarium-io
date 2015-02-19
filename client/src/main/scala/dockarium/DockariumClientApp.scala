@@ -37,6 +37,9 @@ object DockariumClientApp extends JSApp {
 }
 
 
+@JSExportAll
+case class ServerConnectionStatus(name: String, icon: String)
+
 @injectable("$websocketConnectionService")
 class WebsocketConnectionService(rootScope: RootScope) {
 
@@ -48,9 +51,6 @@ class WebsocketConnectionService(rootScope: RootScope) {
     "receiving" -> "glyphicon-ok-sign icon-success",
     "error" -> "glyphicon-remove-sign icon-danger"
   )
-
-  @JSExportAll
-  case class ServerConnectionStatus(name: String, icon: String)
 
   var serverConnectionStatus = ServerConnectionStatus("initializing", statusIcons("initializing"))
 
@@ -83,8 +83,7 @@ class WebsocketConnectionService(rootScope: RootScope) {
 
     rootScope.$apply {
       println(s"Broadcasting message ${e.data.toString}")
-      var msg = JSON.parse(e.data.toString);
-      rootScope.$broadcast("serverEvent", msg);
+      rootScope.$broadcast("serverEvent", JSON.parse(e.data.toString))
     }
 
   }

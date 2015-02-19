@@ -15,6 +15,10 @@ object AdminCtrl extends Controller {
   @JSExportAll
   case class DockerHost(name: String, host: String, port: Int)
 
+  @JSExportAll
+  case class R(command: String, payload: DockerHost)
+
+
   @inject
   var websocketConnectionService: WebsocketConnectionService = _
 
@@ -23,7 +27,13 @@ object AdminCtrl extends Controller {
 
     scope.dockerhost = DockerHost("localhost", "localhost", 2375)
 
-    scope.saveDockerConnection = () => println("ohohoh")
+    // TODO type safety
+    scope.saveDockerConnection = () => {
+
+
+
+      websocketConnectionService.send(R("saveDockerConnection", scope.dockerhost))
+    }
 
   }
 
@@ -34,6 +44,8 @@ object AdminCtrl extends Controller {
     var saveDockerConnection: js.Function0[_] = js.native
   }
 }
+
+
 
 /*
 <h2>Admin</h2>
