@@ -134,7 +134,6 @@ app.filter('eventStatusIconClass', function(){
     }
 });
 
-
 app.controller("AuthenticationCtrl", function($scope, $log, $modal, serverConnection){
 
 
