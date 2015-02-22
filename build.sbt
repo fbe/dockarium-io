@@ -4,6 +4,7 @@ lazy val clients = Seq(dockariumClient)
 lazy val scalaV = "2.11.5"
 
 lazy val dockariumServer = (project in file("server")).settings(
+  resolvers += Resolver.url("scala-js-releases", url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(Resolver.ivyStylePatterns),
   scalaVersion := scalaV,
   scalaJSProjects := clients,
   pipelineStages := Seq(scalaJSProd/*, gzip*/),
@@ -21,7 +22,8 @@ lazy val dockariumServer = (project in file("server")).settings(
     "org.webjars" % "font-awesome" % "4.3.0-1",
     "org.webjars" % "angular-ui-bootstrap" % "0.12.0",
     "org.webjars" % "angular-ui-router" % "0.2.13",
-    "io.spray" % "spray-can_2.11" % "1.3.2"
+    "io.spray" % "spray-can_2.11" % "1.3.2",
+    "org.scalajs" %% "scalajs-pickling-play-json" % "0.3.1"
   ),
   EclipseKeys.skipParents in ThisBuild := false).
   enablePlugins(PlayScala).
@@ -36,7 +38,8 @@ lazy val dockariumClient = (project in file("client")).settings(
   unmanagedSourceDirectories in Compile := Seq((scalaSource in Compile).value),
   libraryDependencies ++= Seq(
     "org.scala-js" %%% "scalajs-dom" % "0.8.0",
-    "com.greencatsoft" %%% "scalajs-angular" % "0.3"
+    "com.greencatsoft" %%% "scalajs-angular" % "0.3",
+    "org.scalajs" %%% "scalajs-pickling" % "0.4-SNAPSHOT"
   )).
   enablePlugins(ScalaJSPlugin, ScalaJSPlay).
   dependsOn(dockariumSharedJs)

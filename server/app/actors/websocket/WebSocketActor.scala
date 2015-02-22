@@ -4,10 +4,13 @@ import actors.DockerEvent
 import actors.websocket.ClientCommands.{Authenticate, GetAllDockerConnections, SaveDockerConnection, ClientCommand}
 import actors.websocket.WebSocketActor.{DeregisterWebSocket, RegisterWebSocket}
 import akka.actor.{Actor, ActorRef, ActorSelection, Props}
+import dockarium.api.Messages._
 import docker.DockerCommands.CreateContainersCommand
+import org.scalajs.spickling.PicklerRegistry
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 import play.api.libs.ws.WS
+import org.scalajs.spickling.playjson._
 
 /**
  * Created by becker on 2/5/15.
@@ -18,6 +21,12 @@ case class ServerEvent(name: String, payLoad: JsValue)
 
 
 object WebSocketActor {
+
+  PicklerRegistry.register[DockerHost]
+  PicklerRegistry.register[SaveDockerHost]
+  PicklerRegistry.register[AuthenticationRequired]
+
+
   def props(out: ActorRef, dockariumActor: ActorSelection) = Props(new WebSocketActor(out, dockariumActor))
 
   case class RegisterWebSocket(socket: ActorRef)
@@ -36,6 +45,7 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
   import play.api.Play.current
 
   import scala.concurrent.ExecutionContext.Implicits.global
+  import org.scalajs.spickling.playjson._
 
   implicit val formats = Json.format[ClientCommand]
   implicit val formats2 = Json.format[SaveDockerConnection]
@@ -43,7 +53,7 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
 
   var authenticated = false
 
-  out ! Json.toJson(ServerEvent("AuthenticationRequired", Json.parse("{}")))
+  out ! PicklerRegistry.pickle(AuthenticationRequired())
 
 
   def processClientCommand(clientCommand: ClientCommand) = clientCommand.command match {
@@ -136,10 +146,17 @@ class WebSocketActor(out: ActorRef, dockariumActor: ActorSelection) extends Acto
 
     case incomingCommand: JsValue =>
 
+      println(incomingCommand.toString())
+      val value: Any = PicklerRegistry.unpickle(incomingCommand)
+      println(value)
+      /*
+
+
       Json.fromJson[ClientCommand](incomingCommand) match {
         case JsSuccess(cmd, _) => processClientCommand(cmd)
         case JsError(e) => Logger.error(s"Failed to parse incoming command, $e");
       }
+      */
 
     case msg => Logger.error(s"unknown message $msg")
   }

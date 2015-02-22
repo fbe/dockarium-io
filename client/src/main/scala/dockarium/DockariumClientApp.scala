@@ -2,11 +2,14 @@ package dockarium
 
 import com.greencatsoft.angularjs.core.RootScope
 import com.greencatsoft.angularjs.{inject, injectable, Factory, Angular}
+import dockarium.api.Messages._
 import dockarium.controller._
 import org.scalajs.dom
 import org.scalajs.dom.Event
 import org.scalajs.dom.raw.MessageEvent
+import org.scalajs.spickling.PicklerRegistry
 
+import scala.scalajs.js
 import scala.scalajs.js.{JSON, JSApp}
 import scala.scalajs.js.annotation.{JSExportAll, JSExport}
 
@@ -35,6 +38,29 @@ object DockariumClientApp extends JSApp {
 
   }
 }
+
+object Pickling {
+
+  import org.scalajs.spickling.jsany._
+
+  PicklerRegistry.register[DockerHost]
+  PicklerRegistry.register[SaveDockerHost]
+  PicklerRegistry.register[AuthenticationRequired]
+
+  def unpickle(data: String): Any = {
+    // AS instance of js.Any, otherwise the is confused
+    val parsed = JSON.parse(data).asInstanceOf[js.Any]
+    val unpickled = PicklerRegistry.unpickle(parsed)
+    unpickled
+  }
+
+  def unpickle(data: js.Any): Any = unpickle(data.toString)
+
+  // TODO extract "t" from json manually instead of unmarshalling the entire object (may be large..)
+  def getPickleClassName(data: js.Any): String = getPickleClassName(data.toString)
+  def getPickleClassName(data: String): String = unpickle(data).getClass.getName
+
+  }
 
 
 @JSExportAll
@@ -72,18 +98,21 @@ class WebsocketConnectionService(rootScope: RootScope) {
     }
   }
 
-  def send(args: Any) = {
-    println("Sending " + JSON.stringify(args.toString))
-    ws.send(JSON.stringify(args.toString))
+  def send(args: js.Any) = {
+    println("Sending " + JSON.stringify(args))
+    ws.send(JSON.stringify(args))
   }
 
   ws.onopen = (e: Event) => broadcastStatus("connected", statusIcons("receiving"))
   ws.onclose = (e: Event) => broadcastStatus("disconnected", statusIcons("error"))
+
   ws.onmessage = (e: MessageEvent) => {
 
+    val className = Pickling.getPickleClassName(e.data)
+
     rootScope.$apply {
-      println(s"Broadcasting message ${e.data.toString}")
-      rootScope.$broadcast("serverEvent", JSON.parse(e.data.toString))
+      println(s"Broadcasting message $className")
+      rootScope.$broadcast(className, e.data)
     }
 
   }
